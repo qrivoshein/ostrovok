@@ -13,18 +13,31 @@ final class NowPlayingService {
 
     private var observers: [Any] = []
     private var mediaRemoteWorks = false
+    private var progressTimer: Timer?
 
     func start() {
         setupMediaRemote()
         setupDistributedNotifications()
+        startProgressTimer()
     }
 
     func stop() {
+        progressTimer?.invalidate()
+        progressTimer = nil
         for obs in observers {
             NotificationCenter.default.removeObserver(obs)
             DistributedNotificationCenter.default().removeObserver(obs)
         }
         observers.removeAll()
+    }
+
+    private func startProgressTimer() {
+        progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.isPlaying, self.duration > 0 else { return }
+                self.elapsedTime = min(self.elapsedTime + 1.0, self.duration)
+            }
+        }
     }
 
     func togglePlayPause() {

@@ -17,8 +17,8 @@ final class NotchManager {
 
         viewModel.notchSize = notchSize
 
-        let maxExpandedWidth = notchSize.width + 280
-        let maxExpandedHeight = notchSize.height + 150
+        let maxExpandedWidth = notchSize.width + 320
+        let maxExpandedHeight = notchSize.height + 220
         let windowRect = NSRect(
             x: notchRect.midX - maxExpandedWidth / 2,
             y: notchRect.maxY - maxExpandedHeight,

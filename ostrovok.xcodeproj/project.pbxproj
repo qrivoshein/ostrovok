@@ -22,6 +22,7 @@
 		8A1B2C3D002C0000000000FF /* MediaRemoteBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D002D0000000000FF /* MediaRemoteBridge.swift */; };
 		8A1B2C3D002E0000000000FF /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D002F0000000000FF /* NowPlayingService.swift */; };
 		8A1B2C3D00300000000000FF /* NowPlayingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00310000000000FF /* NowPlayingWidget.swift */; };
+		8A1B2C3D00340000000000FF /* AudioWaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00350000000000FF /* AudioWaveView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		8A1B2C3D001C0000000000FF /* NotchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchContentView.swift; sourceTree = "<group>"; };
 		8A1B2C3D00250000000000FF /* NotchShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchShape.swift; sourceTree = "<group>"; };
 		8A1B2C3D00270000000000FF /* MouseTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseTracker.swift; sourceTree = "<group>"; };
+		8A1B2C3D00350000000000FF /* AudioWaveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveView.swift; sourceTree = "<group>"; };
 		8A1B2C3D00290000000000FF /* CollapsedNotchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsedNotchView.swift; sourceTree = "<group>"; };
 		8A1B2C3D002B0000000000FF /* ExpandedNotchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedNotchView.swift; sourceTree = "<group>"; };
 		8A1B2C3D002D0000000000FF /* MediaRemoteBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRemoteBridge.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				8A1B2C3D00250000000000FF /* NotchShape.swift */,
 				8A1B2C3D00290000000000FF /* CollapsedNotchView.swift */,
 				8A1B2C3D002B0000000000FF /* ExpandedNotchView.swift */,
+				8A1B2C3D00350000000000FF /* AudioWaveView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -206,6 +209,7 @@
 				8A1B2C3D002C0000000000FF /* MediaRemoteBridge.swift in Sources */,
 				8A1B2C3D002E0000000000FF /* NowPlayingService.swift in Sources */,
 				8A1B2C3D00300000000000FF /* NowPlayingWidget.swift in Sources */,
+				8A1B2C3D00340000000000FF /* AudioWaveView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
