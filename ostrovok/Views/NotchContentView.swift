@@ -14,8 +14,9 @@ struct NotchContentView: View {
                 .fill(.black)
                 .frame(
                     width: viewModel.currentWidth + 40,
-                    height: viewModel.currentHeight
+                    height: max(viewModel.currentHeight, 1)
                 )
+                .opacity(viewModel.state == .collapsed ? 0 : 1)
 
                 if viewModel.isExpanded {
                     ExpandedNotchView(viewModel: viewModel)

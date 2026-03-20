@@ -4,11 +4,12 @@ import AppKit
 final class MouseTracker {
     private weak var window: NotchWindow?
     private weak var viewModel: NotchViewModel?
-    private var moveMonitor: Any?
-    private var scrollMonitor: Any?
+    private var globalMoveMonitor: Any?
+    private var localMoveMonitor: Any?
+    private var globalScrollMonitor: Any?
     private var localScrollMonitor: Any?
     private var collapseWorkItem: DispatchWorkItem?
-    private var hoverZone: NSRect = .zero
+    private var notchRect: NSRect = .zero
     private var scrollAccumulator: CGFloat = 0
     private var lastScrollTime: TimeInterval = 0
 
@@ -18,60 +19,62 @@ final class MouseTracker {
     }
 
     func install(notchRect: NSRect) {
-        // Generous hover zone around the notch
-        hoverZone = notchRect.insetBy(dx: -25, dy: -20)
+        self.notchRect = notchRect
 
-        moveMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved]) { [weak self] event in
-            MainActor.assumeIsolated {
-                self?.handleMouseMoved()
-            }
+        // Global monitors: fire when mouse is outside our window
+        globalMoveMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved]) { [weak self] _ in
+            MainActor.assumeIsolated { self?.handleMouseMoved() }
         }
 
-        scrollMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.scrollWheel]) { [weak self] event in
-            MainActor.assumeIsolated {
-                self?.handleScroll(event)
-            }
+        globalScrollMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.scrollWheel]) { [weak self] event in
+            MainActor.assumeIsolated { self?.handleScroll(event) }
+        }
+
+        // Local monitors: fire when mouse is inside our window (expanded state)
+        localMoveMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { [weak self] event in
+            MainActor.assumeIsolated { self?.handleMouseMoved() }
+            return event
         }
 
         localScrollMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] event in
-            MainActor.assumeIsolated {
-                self?.handleScroll(event)
-            }
+            MainActor.assumeIsolated { self?.handleScroll(event) }
             return event
         }
     }
 
     func uninstall() {
-        if let moveMonitor { NSEvent.removeMonitor(moveMonitor) }
-        if let scrollMonitor { NSEvent.removeMonitor(scrollMonitor) }
-        if let localScrollMonitor { NSEvent.removeMonitor(localScrollMonitor) }
-        moveMonitor = nil
-        scrollMonitor = nil
+        for monitor in [globalMoveMonitor, localMoveMonitor, globalScrollMonitor, localScrollMonitor] {
+            if let m = monitor { NSEvent.removeMonitor(m) }
+        }
+        globalMoveMonitor = nil
+        localMoveMonitor = nil
+        globalScrollMonitor = nil
         localScrollMonitor = nil
         collapseWorkItem?.cancel()
     }
 
-    // MARK: - Mouse
+    // MARK: - Mouse Move
 
     private func handleMouseMoved() {
         guard let window, let viewModel else { return }
+        let mouse = NSEvent.mouseLocation
 
-        let mouseLocation = NSEvent.mouseLocation
         guard let screen = ScreenHelper.notchScreen() else { return }
-        let topThreshold = screen.frame.maxY - 200
-        guard mouseLocation.y > topThreshold else {
+        let topThreshold = screen.frame.maxY - 250
+        guard mouse.y > topThreshold else {
             scheduleCollapse(viewModel: viewModel, window: window)
             return
         }
 
-        let effectiveZone: NSRect
+        let zone: NSRect
         if viewModel.isExpanded {
-            effectiveZone = window.frame.insetBy(dx: -30, dy: -30)
+            zone = window.frame.insetBy(dx: -20, dy: -20)
         } else {
-            effectiveZone = hoverZone
+            // Hover zone: notch area + generous padding
+            zone = notchRect.insetBy(dx: -30, dy: -20)
         }
 
-        if effectiveZone.contains(mouseLocation) {
+        if zone.contains(mouse) {
             collapseWorkItem?.cancel()
             collapseWorkItem = nil
             if viewModel.state == .collapsed {
@@ -82,58 +85,50 @@ final class MouseTracker {
         }
     }
 
-    // MARK: - Scroll (two-finger gesture)
+    // MARK: - Scroll Gesture
 
     private func handleScroll(_ event: NSEvent) {
         guard let window, let viewModel else { return }
+        let mouse = NSEvent.mouseLocation
 
-        let mouseLocation = NSEvent.mouseLocation
-
-        // Wide detection zone: entire notch area + generous padding
+        // Wide scroll detection: notch area + 60pt padding all around
         let scrollZone: NSRect
         if viewModel.isExpanded {
-            scrollZone = window.frame.insetBy(dx: -40, dy: -40)
+            scrollZone = window.frame.insetBy(dx: -50, dy: -50)
         } else {
-            scrollZone = hoverZone.insetBy(dx: -40, dy: -40)
+            scrollZone = notchRect.insetBy(dx: -60, dy: -40)
         }
 
-        guard scrollZone.contains(mouseLocation) else { return }
+        guard scrollZone.contains(mouse) else { return }
 
-        // Accumulate scroll delta over a short time window
+        // Reset accumulator if too much time has passed
         let now = ProcessInfo.processInfo.systemUptime
-        if now - lastScrollTime > 0.3 {
+        if now - lastScrollTime > 0.4 {
             scrollAccumulator = 0
         }
         lastScrollTime = now
 
-        // Determine physical finger direction:
-        // We want physical finger-down to expand, finger-up to collapse.
-        // With natural scrolling (isDirectionInvertedFromDevice=true):
-        //   finger down → scrollingDeltaY < 0
-        // Without natural scrolling:
-        //   finger down → scrollingDeltaY > 0
-        let delta = event.scrollingDeltaY
-        let physicalDelta: CGFloat
+        // Convert to physical finger direction
+        // Natural scrolling: deltaY is inverted from finger direction
+        let rawDelta = event.scrollingDeltaY
+        let fingerDelta: CGFloat
         if event.isDirectionInvertedFromDevice {
-            physicalDelta = -delta  // invert back to physical direction
+            fingerDelta = -rawDelta
         } else {
-            physicalDelta = delta
+            fingerDelta = rawDelta
         }
 
-        scrollAccumulator += physicalDelta
+        scrollAccumulator += fingerDelta
 
-        let expandThreshold: CGFloat = 4.0
-        let collapseThreshold: CGFloat = 4.0
-
-        if scrollAccumulator > expandThreshold && !viewModel.isExpanded {
-            // Physical finger down → expand
+        // Finger swipe down (positive accumulated) → expand
+        // Finger swipe up (negative accumulated) → collapse
+        if scrollAccumulator > 3.0 && !viewModel.isExpanded {
             collapseWorkItem?.cancel()
             collapseWorkItem = nil
             viewModel.state = .expanded
             window.ignoresMouseEvents = false
             scrollAccumulator = 0
-        } else if scrollAccumulator < -collapseThreshold && viewModel.isExpanded {
-            // Physical finger up → collapse
+        } else if scrollAccumulator < -3.0 && viewModel.isExpanded {
             viewModel.state = .collapsed
             window.ignoresMouseEvents = true
             scrollAccumulator = 0
@@ -145,7 +140,7 @@ final class MouseTracker {
     private func scheduleCollapse(viewModel: NotchViewModel, window: NotchWindow) {
         guard viewModel.state != .collapsed, collapseWorkItem == nil else { return }
 
-        let delay: TimeInterval = viewModel.isExpanded ? 0.5 : 0.15
+        let delay: TimeInterval = viewModel.isExpanded ? 0.4 : 0.1
 
         let workItem = DispatchWorkItem { [weak viewModel, weak window] in
             MainActor.assumeIsolated {
