@@ -9,7 +9,7 @@ final class NotchWindow: NSPanel {
             defer: false
         )
 
-        level = .statusBar
+        level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()) - 1)
         backgroundColor = .clear
         isOpaque = false
         hasShadow = false
@@ -30,6 +30,11 @@ final class NotchWindow: NSPanel {
         ]
 
         acceptsMouseMovedEvents = true
+    }
+
+    // Prevent macOS from constraining the window below the menu bar
+    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
+        return frameRect
     }
 
     override var canBecomeKey: Bool { true }
