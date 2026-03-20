@@ -17,8 +17,8 @@ final class NotchManager {
 
         viewModel.notchSize = notchSize
 
-        let maxExpandedWidth = notchSize.width + 240
-        let maxExpandedHeight = notchSize.height + 140
+        let maxExpandedWidth = notchSize.width + 280
+        let maxExpandedHeight = notchSize.height + 150
         let windowRect = NSRect(
             x: notchRect.midX - maxExpandedWidth / 2,
             y: notchRect.maxY - maxExpandedHeight,
@@ -31,8 +31,13 @@ final class NotchManager {
             rootView: NotchContentView(viewModel: viewModel)
                 .ignoresSafeArea()
         )
+        hostingView.frame = NSRect(origin: .zero, size: windowRect.size)
         window.contentView = hostingView
+
         window.orderFrontRegardless()
+        // Force the frame to ensure it covers the notch area
+        window.setFrame(windowRect, display: true)
+
         self.notchWindow = window
 
         let tracker = MouseTracker(window: window, viewModel: viewModel)
@@ -49,7 +54,7 @@ final class NotchManager {
 
         viewModel.start()
 
-        print("[Ostrovok] Notch overlay active: \(notchSize.width)x\(notchSize.height)")
+        print("[Ostrovok] Notch overlay: \(notchSize.width)x\(notchSize.height) at (\(windowRect.origin.x), \(windowRect.origin.y))")
     }
 
     private func screenDidChange() {

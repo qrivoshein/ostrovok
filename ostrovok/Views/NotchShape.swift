@@ -3,62 +3,48 @@ import SwiftUI
 struct NotchShape: Shape {
     var width: CGFloat
     var height: CGFloat
-    var cornerRadius: CGFloat = 12
-    var topCornerRadius: CGFloat = 6
+    var bottomRadius: CGFloat = 20
 
-    var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(width, height) }
+    var animatableData: AnimatablePair<AnimatablePair<CGFloat, CGFloat>, CGFloat> {
+        get { AnimatablePair(AnimatablePair(width, height), bottomRadius) }
         set {
-            width = newValue.first
-            height = newValue.second
+            width = newValue.first.first
+            height = newValue.first.second
+            bottomRadius = newValue.second
         }
     }
 
     func path(in rect: CGRect) -> Path {
         let midX = rect.midX
         let halfW = width / 2
-        let cr = cornerRadius
-        let tcr = topCornerRadius
+        let r = min(bottomRadius, halfW, height)
 
         var path = Path()
 
-        // Start at top-left
-        path.move(to: CGPoint(x: midX - halfW + tcr, y: 0))
+        // Top-left (tight corner blending with screen bezel)
+        path.move(to: CGPoint(x: midX - halfW, y: 0))
 
         // Top edge
-        path.addLine(to: CGPoint(x: midX + halfW - tcr, y: 0))
+        path.addLine(to: CGPoint(x: midX + halfW, y: 0))
 
-        // Top-right corner
-        path.addQuadCurve(
-            to: CGPoint(x: midX + halfW, y: tcr),
-            control: CGPoint(x: midX + halfW, y: 0)
-        )
+        // Right edge down to bottom-right curve
+        path.addLine(to: CGPoint(x: midX + halfW, y: height - r))
 
-        // Right edge down
-        path.addLine(to: CGPoint(x: midX + halfW, y: height - cr))
-
-        // Bottom-right corner
-        path.addQuadCurve(
-            to: CGPoint(x: midX + halfW - cr, y: height),
-            control: CGPoint(x: midX + halfW, y: height)
+        // Bottom-right: smooth cubic bezier for squircle-like corner
+        path.addCurve(
+            to: CGPoint(x: midX + halfW - r, y: height),
+            control1: CGPoint(x: midX + halfW, y: height - r * 0.1),
+            control2: CGPoint(x: midX + halfW - r * 0.1, y: height)
         )
 
         // Bottom edge
-        path.addLine(to: CGPoint(x: midX - halfW + cr, y: height))
+        path.addLine(to: CGPoint(x: midX - halfW + r, y: height))
 
-        // Bottom-left corner
-        path.addQuadCurve(
-            to: CGPoint(x: midX - halfW, y: height - cr),
-            control: CGPoint(x: midX - halfW, y: height)
-        )
-
-        // Left edge up
-        path.addLine(to: CGPoint(x: midX - halfW, y: tcr))
-
-        // Top-left corner
-        path.addQuadCurve(
-            to: CGPoint(x: midX - halfW + tcr, y: 0),
-            control: CGPoint(x: midX - halfW, y: 0)
+        // Bottom-left: smooth cubic bezier
+        path.addCurve(
+            to: CGPoint(x: midX - halfW, y: height - r),
+            control1: CGPoint(x: midX - halfW + r * 0.1, y: height),
+            control2: CGPoint(x: midX - halfW, y: height - r * 0.1)
         )
 
         path.closeSubpath()

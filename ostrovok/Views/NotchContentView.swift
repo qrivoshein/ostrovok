@@ -8,7 +8,8 @@ struct NotchContentView: View {
             ZStack(alignment: .top) {
                 NotchShape(
                     width: viewModel.currentWidth,
-                    height: viewModel.currentHeight
+                    height: viewModel.currentHeight,
+                    bottomRadius: viewModel.bottomCornerRadius
                 )
                 .fill(.black)
                 .frame(
@@ -19,13 +20,13 @@ struct NotchContentView: View {
                 if viewModel.isExpanded {
                     ExpandedNotchView(viewModel: viewModel)
                         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
-                } else {
+                } else if viewModel.isHovering {
                     CollapsedNotchView(viewModel: viewModel)
                         .transition(.opacity)
                 }
             }
             .animation(
-                .spring(response: 0.3, dampingFraction: 0.75),
+                .spring(response: 0.35, dampingFraction: 0.7),
                 value: viewModel.state
             )
 

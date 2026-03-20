@@ -11,7 +11,7 @@ final class NowPlayingService {
     var duration: TimeInterval = 0
     var elapsedTime: TimeInterval = 0
 
-    private var observers: [NSObjectProtocol] = []
+    private var observers: [Any] = []
     private var mediaRemoteWorks = false
 
     func start() {
@@ -20,8 +20,10 @@ final class NowPlayingService {
     }
 
     func stop() {
-        observers.forEach { NotificationCenter.default.removeObserver($0) }
-        observers.forEach { DistributedNotificationCenter.default().removeObserver($0) }
+        for obs in observers {
+            NotificationCenter.default.removeObserver(obs)
+            DistributedNotificationCenter.default().removeObserver(obs)
+        }
         observers.removeAll()
     }
 
@@ -37,7 +39,7 @@ final class NowPlayingService {
         _ = MediaRemoteBridge.sendCommand?(MediaRemoteBridge.commandPreviousTrack, nil)
     }
 
-    // MARK: - MediaRemote (may be blocked on macOS 15.4+)
+    // MARK: - MediaRemote
 
     private func setupMediaRemote() {
         MediaRemoteBridge.registerForNotifications?(DispatchQueue.main)
@@ -104,12 +106,11 @@ final class NowPlayingService {
         }
     }
 
-    // MARK: - Distributed Notifications fallback (Apple Music, Spotify)
+    // MARK: - Distributed Notifications fallback
 
     private func setupDistributedNotifications() {
         let dnc = DistributedNotificationCenter.default()
 
-        // Apple Music / iTunes
         observers.append(
             dnc.addObserver(
                 forName: NSNotification.Name("com.apple.Music.playerInfo"),
@@ -122,7 +123,6 @@ final class NowPlayingService {
             }
         )
 
-        // Spotify
         observers.append(
             dnc.addObserver(
                 forName: NSNotification.Name("com.spotify.client.PlaybackStateChanged"),
@@ -148,9 +148,12 @@ final class NowPlayingService {
         if newArtist != artist { artist = newArtist }
         if newAlbum != album { album = newAlbum }
         isPlaying = (state == "Playing")
-        duration = info["Total Time"] as? TimeInterval ?? 0
 
-        fetchArtwork(from: "Music")
+        if let totalTime = info["Total Time"] as? Double {
+            duration = totalTime / 1000.0
+        }
+
+        fetchArtworkAsync(from: "Music")
     }
 
     private func handleSpotifyNotification(_ userInfo: [AnyHashable: Any]?) {
@@ -170,68 +173,56 @@ final class NowPlayingService {
             duration = TimeInterval(durationMs) / 1000.0
         }
 
-        fetchArtwork(from: "Spotify")
+        fetchArtworkAsync(from: "Spotify")
     }
 
-    private func fetchArtwork(from app: String) {
-        let script: String
-        if app == "Spotify" {
-            script = """
-            tell application "Spotify"
-                if it is running then
-                    return artwork url of current track
-                end if
-            end tell
-            """
-        } else {
-            script = """
-            tell application "Music"
-                if it is running then
-                    try
-                        set artData to raw data of artwork 1 of current track
-                        return artData
-                    end try
-                end if
-            end tell
-            """
-        }
-
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+    private func fetchArtworkAsync(from app: String) {
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let image: NSImage?
             if app == "Spotify" {
-                self?.fetchSpotifyArtwork(script: script)
+                image = Self.fetchSpotifyArtwork()
             } else {
-                self?.fetchMusicArtwork(script: script)
+                image = Self.fetchMusicArtwork()
+            }
+            if let image {
+                await MainActor.run {
+                    self?.artworkImage = image
+                }
             }
         }
     }
 
-    private nonisolated func fetchSpotifyArtwork(script: String) {
-        guard let appleScript = NSAppleScript(source: script) else { return }
+    private static nonisolated func fetchSpotifyArtwork() -> NSImage? {
+        let script = """
+        tell application "Spotify"
+            if it is running then
+                return artwork url of current track
+            end if
+        end tell
+        """
+        guard let appleScript = NSAppleScript(source: script) else { return nil }
         var error: NSDictionary?
         let result = appleScript.executeAndReturnError(&error)
-
         guard error == nil, let urlString = result.stringValue,
-              let url = URL(string: urlString) else { return }
-
-        guard let data = try? Data(contentsOf: url),
-              let image = NSImage(data: data) else { return }
-
-        MainActor.assumeIsolated {
-            self.artworkImage = image
-        }
+              let url = URL(string: urlString),
+              let data = try? Data(contentsOf: url) else { return nil }
+        return NSImage(data: data)
     }
 
-    private nonisolated func fetchMusicArtwork(script: String) {
-        guard let appleScript = NSAppleScript(source: script) else { return }
+    private static nonisolated func fetchMusicArtwork() -> NSImage? {
+        let script = """
+        tell application "Music"
+            if it is running then
+                try
+                    return raw data of artwork 1 of current track
+                end try
+            end if
+        end tell
+        """
+        guard let appleScript = NSAppleScript(source: script) else { return nil }
         var error: NSDictionary?
         let result = appleScript.executeAndReturnError(&error)
-
-        guard error == nil else { return }
-        let data = result.data
-        guard let image = NSImage(data: data) else { return }
-
-        MainActor.assumeIsolated {
-            self.artworkImage = image
-        }
+        guard error == nil else { return nil }
+        return NSImage(data: result.data)
     }
 }
