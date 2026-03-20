@@ -1,10 +1,19 @@
 import AppKit
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
+    private var notchManager: NotchManager?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusBar()
+        setupNotch()
+    }
+
+    private func setupNotch() {
+        let manager = NotchManager()
+        manager.setup()
+        self.notchManager = manager
     }
 
     private func setupStatusBar() {

@@ -10,6 +10,18 @@
 		8A1B2C3D00060000000000FF /* OstrovokApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00010000000000FF /* OstrovokApp.swift */; };
 		8A1B2C3D00070000000000FF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00020000000000FF /* AppDelegate.swift */; };
 		8A1B2C3D00080000000000FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00040000000000FF /* Assets.xcassets */; };
+		8A1B2C3D001D0000000000FF /* ScreenHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00180000000000FF /* ScreenHelper.swift */; };
+		8A1B2C3D001E0000000000FF /* NotchWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00190000000000FF /* NotchWindow.swift */; };
+		8A1B2C3D001F0000000000FF /* NotchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D001A0000000000FF /* NotchManager.swift */; };
+		8A1B2C3D00200000000000FF /* NotchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D001B0000000000FF /* NotchViewModel.swift */; };
+		8A1B2C3D00210000000000FF /* NotchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D001C0000000000FF /* NotchContentView.swift */; };
+		8A1B2C3D00240000000000FF /* NotchShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00250000000000FF /* NotchShape.swift */; };
+		8A1B2C3D00260000000000FF /* MouseTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00270000000000FF /* MouseTracker.swift */; };
+		8A1B2C3D00280000000000FF /* CollapsedNotchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00290000000000FF /* CollapsedNotchView.swift */; };
+		8A1B2C3D002A0000000000FF /* ExpandedNotchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D002B0000000000FF /* ExpandedNotchView.swift */; };
+		8A1B2C3D002C0000000000FF /* MediaRemoteBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D002D0000000000FF /* MediaRemoteBridge.swift */; };
+		8A1B2C3D002E0000000000FF /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D002F0000000000FF /* NowPlayingService.swift */; };
+		8A1B2C3D00300000000000FF /* NowPlayingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1B2C3D00310000000000FF /* NowPlayingWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +31,18 @@
 		8A1B2C3D00040000000000FF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A1B2C3D00050000000000FF /* ostrovok.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ostrovok.entitlements; sourceTree = "<group>"; };
 		8A1B2C3D000C0000000000FF /* Ostrovok.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ostrovok.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A1B2C3D00180000000000FF /* ScreenHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenHelper.swift; sourceTree = "<group>"; };
+		8A1B2C3D00190000000000FF /* NotchWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindow.swift; sourceTree = "<group>"; };
+		8A1B2C3D001A0000000000FF /* NotchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchManager.swift; sourceTree = "<group>"; };
+		8A1B2C3D001B0000000000FF /* NotchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchViewModel.swift; sourceTree = "<group>"; };
+		8A1B2C3D001C0000000000FF /* NotchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchContentView.swift; sourceTree = "<group>"; };
+		8A1B2C3D00250000000000FF /* NotchShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchShape.swift; sourceTree = "<group>"; };
+		8A1B2C3D00270000000000FF /* MouseTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseTracker.swift; sourceTree = "<group>"; };
+		8A1B2C3D00290000000000FF /* CollapsedNotchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsedNotchView.swift; sourceTree = "<group>"; };
+		8A1B2C3D002B0000000000FF /* ExpandedNotchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedNotchView.swift; sourceTree = "<group>"; };
+		8A1B2C3D002D0000000000FF /* MediaRemoteBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRemoteBridge.swift; sourceTree = "<group>"; };
+		8A1B2C3D002F0000000000FF /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
+		8A1B2C3D00310000000000FF /* NowPlayingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,11 +69,55 @@
 			children = (
 				8A1B2C3D00010000000000FF /* OstrovokApp.swift */,
 				8A1B2C3D00020000000000FF /* AppDelegate.swift */,
+				8A1B2C3D00220000000000FF /* Core */,
+				8A1B2C3D00230000000000FF /* Views */,
+				8A1B2C3D00320000000000FF /* Widgets */,
+				8A1B2C3D00330000000000FF /* Services */,
 				8A1B2C3D00040000000000FF /* Assets.xcassets */,
 				8A1B2C3D00030000000000FF /* Info.plist */,
 				8A1B2C3D00050000000000FF /* ostrovok.entitlements */,
 			);
 			path = ostrovok;
+			sourceTree = "<group>";
+		};
+		8A1B2C3D00220000000000FF /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				8A1B2C3D00180000000000FF /* ScreenHelper.swift */,
+				8A1B2C3D00190000000000FF /* NotchWindow.swift */,
+				8A1B2C3D001A0000000000FF /* NotchManager.swift */,
+				8A1B2C3D001B0000000000FF /* NotchViewModel.swift */,
+				8A1B2C3D00270000000000FF /* MouseTracker.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		8A1B2C3D00230000000000FF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8A1B2C3D001C0000000000FF /* NotchContentView.swift */,
+				8A1B2C3D00250000000000FF /* NotchShape.swift */,
+				8A1B2C3D00290000000000FF /* CollapsedNotchView.swift */,
+				8A1B2C3D002B0000000000FF /* ExpandedNotchView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		8A1B2C3D00320000000000FF /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				8A1B2C3D00310000000000FF /* NowPlayingWidget.swift */,
+			);
+			path = Widgets;
+			sourceTree = "<group>";
+		};
+		8A1B2C3D00330000000000FF /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8A1B2C3D002D0000000000FF /* MediaRemoteBridge.swift */,
+				8A1B2C3D002F0000000000FF /* NowPlayingService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		8A1B2C3D000B0000000000FF /* Products */ = {
@@ -126,6 +194,18 @@
 			files = (
 				8A1B2C3D00060000000000FF /* OstrovokApp.swift in Sources */,
 				8A1B2C3D00070000000000FF /* AppDelegate.swift in Sources */,
+				8A1B2C3D001D0000000000FF /* ScreenHelper.swift in Sources */,
+				8A1B2C3D001E0000000000FF /* NotchWindow.swift in Sources */,
+				8A1B2C3D001F0000000000FF /* NotchManager.swift in Sources */,
+				8A1B2C3D00200000000000FF /* NotchViewModel.swift in Sources */,
+				8A1B2C3D00210000000000FF /* NotchContentView.swift in Sources */,
+				8A1B2C3D00240000000000FF /* NotchShape.swift in Sources */,
+				8A1B2C3D00260000000000FF /* MouseTracker.swift in Sources */,
+				8A1B2C3D00280000000000FF /* CollapsedNotchView.swift in Sources */,
+				8A1B2C3D002A0000000000FF /* ExpandedNotchView.swift in Sources */,
+				8A1B2C3D002C0000000000FF /* MediaRemoteBridge.swift in Sources */,
+				8A1B2C3D002E0000000000FF /* NowPlayingService.swift in Sources */,
+				8A1B2C3D00300000000000FF /* NowPlayingWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
