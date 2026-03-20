@@ -6,6 +6,7 @@ struct NotchContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .top) {
+                // Shape is always visible, animates size smoothly
                 NotchShape(
                     width: viewModel.currentWidth,
                     height: viewModel.currentHeight,
@@ -14,9 +15,8 @@ struct NotchContentView: View {
                 .fill(.black)
                 .frame(
                     width: viewModel.currentWidth + 40,
-                    height: max(viewModel.currentHeight, 1)
+                    height: viewModel.currentHeight
                 )
-                .opacity(viewModel.state == .collapsed ? 0 : 1)
 
                 if viewModel.isExpanded {
                     ExpandedNotchView(viewModel: viewModel)
@@ -27,7 +27,7 @@ struct NotchContentView: View {
                 }
             }
             .animation(
-                .spring(response: 0.35, dampingFraction: 0.7),
+                .spring(response: 0.3, dampingFraction: 0.75),
                 value: viewModel.state
             )
 

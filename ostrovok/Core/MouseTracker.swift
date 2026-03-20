@@ -108,27 +108,22 @@ final class MouseTracker {
         }
         lastScrollTime = now
 
-        // Convert to physical finger direction
-        // Natural scrolling: deltaY is inverted from finger direction
-        let rawDelta = event.scrollingDeltaY
-        let fingerDelta: CGFloat
-        if event.isDirectionInvertedFromDevice {
-            fingerDelta = -rawDelta
-        } else {
-            fingerDelta = rawDelta
-        }
+        // Use raw scrollingDeltaY directly:
+        // Positive deltaY = content scrolls down = "swipe down" intent
+        // Negative deltaY = content scrolls up = "swipe up" intent
+        let fingerDelta = event.scrollingDeltaY
 
         scrollAccumulator += fingerDelta
 
-        // Finger swipe down (positive accumulated) → expand
-        // Finger swipe up (negative accumulated) → collapse
-        if scrollAccumulator > 3.0 && !viewModel.isExpanded {
+        // Swipe down (positive accumulated) → expand
+        // Swipe up (negative accumulated) → collapse
+        if scrollAccumulator > 2.0 && !viewModel.isExpanded {
             collapseWorkItem?.cancel()
             collapseWorkItem = nil
             viewModel.state = .expanded
             window.ignoresMouseEvents = false
             scrollAccumulator = 0
-        } else if scrollAccumulator < -3.0 && viewModel.isExpanded {
+        } else if scrollAccumulator < -2.0 && viewModel.isExpanded {
             viewModel.state = .collapsed
             window.ignoresMouseEvents = true
             scrollAccumulator = 0

@@ -102,15 +102,24 @@ final class NowPlayingService {
         let newTitle = info[MediaRemoteBridge.keyTitle] as? String ?? ""
         let newArtist = info[MediaRemoteBridge.keyArtist] as? String ?? ""
         let newAlbum = info[MediaRemoteBridge.keyAlbum] as? String ?? ""
+        let trackChanged = !newTitle.isEmpty && newTitle != title
 
         if !newTitle.isEmpty {
-            if newTitle != title { title = newTitle }
+            if trackChanged { title = newTitle }
             if newArtist != artist { artist = newArtist }
             if newAlbum != album { album = newAlbum }
         }
 
-        duration = info[MediaRemoteBridge.keyDuration] as? TimeInterval ?? duration
-        elapsedTime = info[MediaRemoteBridge.keyElapsedTime] as? TimeInterval ?? elapsedTime
+        let newDuration = info[MediaRemoteBridge.keyDuration] as? TimeInterval
+        let newElapsed = info[MediaRemoteBridge.keyElapsedTime] as? TimeInterval
+
+        if let d = newDuration { duration = d }
+        if let e = newElapsed { elapsedTime = e }
+
+        // Reset timer on track change
+        if trackChanged {
+            elapsedTime = newElapsed ?? 0
+        }
 
         // Try MediaRemote artwork first
         if let artworkData = info[MediaRemoteBridge.keyArtwork] as? Data,
@@ -118,7 +127,6 @@ final class NowPlayingService {
             artworkImage = image
             lastArtworkTitle = title
         } else if title != lastArtworkTitle && !title.isEmpty {
-            // MediaRemote didn't provide artwork — try AppleScript
             fetchArtworkViaAppleScript()
         }
     }
